@@ -1,0 +1,160 @@
+﻿@model IEnumerable<PRN221_Assignment03_TranPhamKimSon_SE151317.Models.Post>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table" id="myTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PostId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdatedDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Content)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PublishStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PostId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Content)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PublishStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Author.UserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.CategoryName)
+            </td>
+            <td id="links">
+                <a asp-action="Edit" asp-route-id="@item.PostId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.PostId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.PostId">Delete</a>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts{
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable();
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0-preview.1.22109.13/signalr.min.js"></script>
+    <script>
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notification")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        connection.start().then(() => console.log("OKe"));
+
+        function ready(type, createdDate, updatedDate, title, content, status, authorId, categoryId, postId) {
+
+            console.log("Noti");
+
+            const tableBody = document.getElementById("tableBody");
+            const tr = document.createElement("tr");
+            const td1 = document.createElement("td");
+            const td2 = document.createElement("td");
+            const td3 = document.createElement("td");
+            const td4 = document.createElement("td");
+            const td5 = document.createElement("td");
+            const td6 = document.createElement("td");
+            const td7 = document.createElement("td");
+
+            td1.innerHTML = createdDate;
+            td2.innerHTML = updatedDate;
+            td3.innerHTML = title;
+            td4.innerHTML = content;
+            td5.innerHTML = status;
+            td6.innerHTML = authorId;
+            td7.innerHTML = categoryId;
+
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tr.appendChild(td4);
+            tr.appendChild(td5);
+            tr.appendChild(td6);
+            tr.appendChild(td7);
+
+            //tableBody.insertBefore(tr, tableBody.firstChild);
+            data(postId, createdDate, updatedDate, title, content, status, authorId, categoryId);
+        }
+
+        function data(postId, createdDate, updatedDate, title, content, status, authorId, categoryId) {
+            //$("#myTable").dataTable().fnDestroy();
+            let tmp;
+            if (status === "true") {
+                tmp = '<input type="checkbox" disabled="disabled" checked />';
+            } else {
+                tmp = '<input type="checkbox" disabled="disabled" />';
+            }
+            console.log(postId, createdDate, updatedDate, title, content, status, authorId, categoryId)
+            var t = $('#myTable').DataTable({
+                columnDefs: [{
+                    "defaultContent": '<a href="/Posts/Edit/' + postId + '">Edit</a> | <a href="/Posts/Details/' + postId + '">Details</a> | <a href="/Posts/Delete/' + postId + '">Delete</a>',
+                    "targets": -1,
+                }, {
+                    "defaultContent": tmp,
+                    "targets": -4,
+                    }
+                ],
+                "searchable": true,
+                destroy: true,
+                "bDestroy": true,
+            });
+            t.row.add([postId, createdDate, updatedDate, title, content, , authorId, categoryId,]).draw(false);
+        }
+
+        connection.on("RecieveNoti", ready);
+    </script>
+}

@@ -1,0 +1,108 @@
+﻿@model PRN221_Assignment03_TranPhamKimSon_SE151317.Models.Post
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Post</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" id="form">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="PostId" class="control-label"></label>
+                <input asp-for="PostId" class="form-control" />
+                <span asp-validation-for="PostId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreatedDate" class="control-label"></label>
+                <input asp-for="CreatedDate" class="form-control" />
+                <span asp-validation-for="CreatedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UpdatedDate" class="control-label"></label>
+                <input asp-for="UpdatedDate" class="form-control" />
+                <span asp-validation-for="UpdatedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Content" class="control-label"></label>
+                <input asp-for="Content" class="form-control" />
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="PublishStatus" /> @Html.DisplayNameFor(model => model.PublishStatus)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="AuthorId" class="control-label"></label>
+                <select asp-for="AuthorId" class="form-control" asp-items="ViewBag.AuthorId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label"></label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+@*<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>*@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0-preview.1.22109.13/signalr.min.js"></script>
+<script>
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl("/notification")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+    connection.start().then(() => console.log("OKe"));
+
+    async function addPost(e) {
+        e.preventDefault();
+        $(e.target).validate();
+        if ($(e.target).valid()) {
+            let createdDate = document.getElementById("CreatedDate").value;
+            let updatedDate = document.getElementById("UpdatedDate").value;
+            let title = document.getElementById("Title").value;
+            let content = document.getElementById("Content").value;
+            let status = document.getElementById("PublishStatus").checked;
+            let authorId = document.getElementById("AuthorId").value;
+            let categoryId = document.getElementById("CategoryId").value;
+            let postId = document.getElementById("PostId").value;
+            debugger;
+            try {
+                console.log(createdDate, updatedDate, title, content, status, authorId, categoryId);
+                await sendNoti("add", createdDate, updatedDate, title, content, status, authorId, categoryId, postId);
+            } catch (err) {
+                console.log(err);
+            }
+            //await e.target.submit();
+        }
+
+    }
+
+    async function sendNoti(type, createdDate, updatedDate, title, content, status, authorId, categoryId, postId) {
+        await connection.invoke('SendNoti', type, createdDate, updatedDate, title, content, status.toString(), authorId, categoryId, postId);
+    }
+
+    const form = document.getElementById("form");
+    form.addEventListener("submit", addPost);
+</script>
+}
