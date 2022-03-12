@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using PRN221_Assignment03_TranPhamKimSon_SE151317.Models;
 
 namespace PRN221_Assignment03_TranPhamKimSon_SE151317.Views.Post
 {
+    [Authorize]
     public class PostsController : Controller
     {
         private readonly SignalRAssignmentDB03Context _context = new SignalRAssignmentDB03Context();
@@ -156,6 +158,12 @@ namespace PRN221_Assignment03_TranPhamKimSon_SE151317.Views.Post
         private bool PostExists(int id)
         {
             return _context.Posts.Any(e => e.PostId == id);
+        }
+
+        public async Task<IActionResult> CreateReport(DateTime StartDate, DateTime EndDate)
+        {
+
+            return View();
         }
     }
 }

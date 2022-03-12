@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" id="form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="PostId" />
             <div class="form-group">
@@ -61,4 +61,45 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0-preview.1.22109.13/signalr.min.js"></script>
+    <script>
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl("/notification")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+        connection.start().then(() => console.log("OKe"));
+
+        const oldTitle = document.getElementById("Title").value;
+
+    async function sendNotiUpdate(e) {
+        e.preventDefault();
+        $(e.target).validate();
+        if ($(e.target).valid()) {
+            let createdDate = document.getElementById("CreatedDate").value;
+            let updatedDate = document.getElementById("UpdatedDate").value;
+            let title = document.getElementById("Title").value;
+            let content = document.getElementById("Content").value;
+            let status = document.getElementById("PublishStatus").checked;
+            let authorId = document.getElementById("AuthorId").value;
+            let categoryId = document.getElementById("CategoryId").value;
+            let postId = document.getElementById("PostId").value;
+            try {
+                console.log(createdDate, updatedDate, title, content, status, authorId, categoryId);
+                await sendNoti(createdDate, updatedDate, title, content, status, authorId, categoryId, postId);
+            } catch (err) {
+                console.log(err);
+            }
+            await e.target.submit();
+        }
+    }
+
+        async function sendNoti(createdDate, updatedDate, title, content, status, authorId, categoryId, postId) {
+            await connection.invoke('SendNotiUpdate', createdDate, updatedDate, title, content, status.toString(), authorId, categoryId, postId);
+        }
+
+    const form = document.getElementById("form");
+    form.addEventListener("submit", sendNotiUpdate);
+    </script>
 }

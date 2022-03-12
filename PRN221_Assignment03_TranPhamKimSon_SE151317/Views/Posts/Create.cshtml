@@ -64,7 +64,6 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
-@*<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>*@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0-preview.1.22109.13/signalr.min.js"></script>
 <script>
     var connection = new signalR.HubConnectionBuilder()
@@ -86,14 +85,13 @@
             let authorId = document.getElementById("AuthorId").value;
             let categoryId = document.getElementById("CategoryId").value;
             let postId = document.getElementById("PostId").value;
-            debugger;
             try {
                 console.log(createdDate, updatedDate, title, content, status, authorId, categoryId);
                 await sendNoti("add", createdDate, updatedDate, title, content, status, authorId, categoryId, postId);
             } catch (err) {
                 console.log(err);
             }
-            //await e.target.submit();
+            await e.target.submit();
         }
 
     }

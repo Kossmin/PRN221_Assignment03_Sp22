@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,19 +10,26 @@ using PRN221_Assignment03_TranPhamKimSon_SE151317.Models;
 
 namespace PRN221_Assignment03_TranPhamKimSon_SE151317
 {
+    [Authorize]
     public class AppUsersController : Controller
     {
-        private readonly SignalRAssignmentDB03Context _context;
+        private readonly SignalRAssignmentDB03Context _context = new SignalRAssignmentDB03Context();
 
-        public AppUsersController(SignalRAssignmentDB03Context context)
+        public AppUsersController()
         {
-            _context = context;
         }
 
         // GET: AppUsers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageIndex = 1, int pageSize = 10)
         {
-            return View(await _context.AppUsers.ToListAsync());
+            var tmpTotal = (_context.AppUsers.Count()) / pageSize;
+            if(_context.AppUsers.Count() % pageSize != 0)
+            {
+                tmpTotal += 1;
+            }
+            ViewBag.total = tmpTotal;
+            ViewBag.index = pageIndex;
+            return View(await _context.AppUsers.Skip((pageIndex-1)*pageSize).Take(pageSize).ToListAsync());
         }
 
         // GET: AppUsers/Details/5

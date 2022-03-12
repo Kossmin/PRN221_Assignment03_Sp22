@@ -28,7 +28,7 @@ namespace PRN221_Assignment03_TranPhamKimSon_SE151317
             services.AddControllersWithViews();
             services.AddSignalR();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
-                opt => opt.LoginPath = "/Home/Index");
+                opt => opt.LoginPath = "/Home/Login");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -11,53 +11,77 @@
     <h4>Post</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <input id="postId" asp-for="PostId" hidden/>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.CreatedDate)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.CreatedDate)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.UpdatedDate)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.UpdatedDate)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Title)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Content)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Content)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.PublishStatus)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.PublishStatus)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Author)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Author.UserId)
-        </dd class>
-        <dt class = "col-sm-2">
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Category)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Category.CategoryName)
-        </dd class>
+        </dd>
     </dl>
-    
-    <form asp-action="Delete">
+
+    <form asp-action="Delete" id="form">
         <input type="hidden" asp-for="PostId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
 </div>
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0-preview.1.22109.13/signalr.min.js"></script>
+<script>
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl("/notification")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+    connection.start().then(() => console.log("OKe"));
+
+    async function sendNotiDelete(e) {
+        e.preventDefault();
+        debugger;
+        const postId = document.getElementById("postId").value;
+        await connection.invoke("SendNotiDelete", postId.toString());
+        await e.target.submit();
+    }
+
+    const form = document.getElementById("form");
+    form.addEventListener("submit", sendNotiDelete);
+</script>
+}

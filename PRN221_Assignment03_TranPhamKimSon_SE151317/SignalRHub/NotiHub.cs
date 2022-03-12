@@ -14,8 +14,6 @@ namespace PRN221_Assignment03_TranPhamKimSon_SE151317.SignalRHub
         SignalRAssignmentDB03Context _context = new SignalRAssignmentDB03Context();
         public async Task SendNoti(string type, string createdDate, string updatedDate,string title, string content, string status, string authorId, string categoryId, string postId)
         {
-            if(type == "add")
-            {
                 var post = new Post
                 {
                     PostId = int.Parse(postId),
@@ -29,12 +27,18 @@ namespace PRN221_Assignment03_TranPhamKimSon_SE151317.SignalRHub
                 };
                 _context.Add(post);
                 await _context.SaveChangesAsync();
-                await Clients.All.SendAsync("RecieveNoti", type ,createdDate, updatedDate, title, content, status, authorId, categoryId, post.PostId);
-            }
-            else
-            {
+                await Clients.All.SendAsync("RecieveNotiAdd", type ,createdDate, updatedDate, title, content, status, authorId, categoryId, post.PostId);
+         
+        }
 
-            }
+        public async Task SendNotiDelete(string postId)
+        {
+            await Clients.All.SendAsync("RecieveNotiDelete", postId);
+        }
+
+        public async Task SendNotiUpdate(string createdDate, string updatedDate, string title, string content, string status, string authorId, string categoryId, string postId)
+        {
+            await Clients.All.SendAsync("RecieveNotiUpdate", createdDate, updatedDate, title, content, status, authorId, categoryId, postId);
         }
     }
 }
