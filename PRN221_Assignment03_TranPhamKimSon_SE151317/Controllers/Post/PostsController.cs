@@ -23,6 +23,13 @@ namespace PRN221_Assignment03_TranPhamKimSon_SE151317.Views.Post
             return View(await signalRAssignmentDB03Context.ToListAsync());
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Index(DateTime StartDate, DateTime EndDate)
+        {
+            var signalRAssignmentDB03Context = _context.Posts.Where(post => DateTime.Compare(post.CreatedDate, StartDate) > 0 && DateTime.Compare(post.CreatedDate, EndDate)<0).Include(p => p.Author).Include(p => p.Category);
+            return View(await signalRAssignmentDB03Context.ToListAsync());
+        }
+
         // GET: Posts/Details/5
         public async Task<IActionResult> Details(int? id)
         {
