@@ -57,6 +57,12 @@ namespace PRN221_Assignment03_TranPhamKimSon_SE151317.Controllers
             }
         }
 
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return Redirect("/Home/Login");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
